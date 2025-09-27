@@ -1,0 +1,72 @@
+name: Python application
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.9"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8 pep8-naming flake8-bandit flake8-black flake8-docstrings flake8-spellcheck flake8-variables-names
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Lint with flake8
+        id: flake8
+        run: |
+          # Configure flake8 to exclude specific directories and files
+          flake8 . --count --select=E9,F63,F7,F82,N801,N802,N803,N806,D100,D101,D102,VNE001 --show-source --statistics \
+                   --max-complexity=10 --max-line-length=127 --docstring-convention=pep257
+
+      - name: Post failure message
+        if: github.event_name == 'pull_request' && steps.flake8.outcome == 'failure'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (pr) {
+              const issue_number = pr.number;
+              const comment = `Hi @${{ github.actor }}, it seems like some lint checks did not pass. Please check the logs and push fixes.`;
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue_number,
+                body: comment
+              });
+            }
+
+      - name: Post success message
+        if: github.event_name == 'pull_request' && steps.flake8.outcome == 'success'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (pr) {
+              const issue_number = pr.number;
+              const comment = `Hi @${{ github.actor }}, lint checks passed successfully! Great job!`;
+              github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue_number,
+                body: comment
+              });
+            }
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
