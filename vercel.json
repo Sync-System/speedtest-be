@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/main.py"
+    },
+    {
+      "src": "/ws/speed",
+      "dest": "/main.py"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    }
+  ],
+  "functions": {
+    "main.py": {
+      "maxDuration": 30
+    }
+  }
+}
+
