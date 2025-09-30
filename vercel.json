@@ -19,11 +19,6 @@
       "src": "/static/(.*)",
       "dest": "/static/$1"
     }
-  ],
-  "functions": {
-    "main.py": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }
 
