@@ -1,4 +1,10 @@
 
+"""
+Network Speed Test Web Application
+
+A FastAPI-based speed test application with WebSocket support for real-time
+speed testing functionality.
+"""
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -246,6 +252,7 @@ class ProgressTracker:
         self.last_update = self.start_time
     
     def update(self, progress, speed):
+        """Update progress with throttling to avoid too frequent updates."""
         current_time = time.time()
         if current_time - self.last_update >= 0.5:  # Update every 0.5 seconds
             asyncio.run_coroutine_threadsafe(

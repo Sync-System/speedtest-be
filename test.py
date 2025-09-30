@@ -1,3 +1,9 @@
+"""
+Test module for network speed testing functionality.
+
+This module contains test implementations and utilities for the speed test application.
+"""
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -139,10 +145,10 @@ def get_local_ip():
     """Get local IP address"""
     try:
         # Try to connect to a remote host to determine local IP
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        local_ip = s.getsockname()[0]
-        s.close()
+        socket_conn = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        socket_conn.connect(("8.8.8.8", 80))
+        local_ip = socket_conn.getsockname()[0]
+        socket_conn.close()
         return local_ip
     except:
         try:
